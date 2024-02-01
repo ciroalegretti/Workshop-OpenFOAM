@@ -47,12 +47,10 @@ do
 	( cd "$caseLabel"_"$caseName" && runApplication blockMesh && runApplication $(getApplication) )
 
 	latestTime=$(foamDictionary "$caseLabel"_"$caseName"/system/controlDict -entry endTime -value)
-	: 'latestTime=$(ls ./"$caseLabel"_"$caseName" -1 | sort -n | tail -n 1)'
 
 	postProcess -latestTime -func singleGraph -case "$caseLabel"_"$caseName"
 
 	cp ./"$caseLabel"_"$caseName"/postProcessing/singleGraph/"$latestTime"/line_T.xy ./gnuPlotData/data_T_"$caseName".xy
-: '	cp ./"$caseLabel"_"$caseName"/postProcessing/linesample/"$latestTime"/data_T.xy ./gnuPlotData/data_T_"$caseName".xy'
 
 	echo " "
 done
