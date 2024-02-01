@@ -1,0 +1,53 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2212                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+<<<<<<<< HEAD:run/WFP/waterFaucetProblem.orig/0/g
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    object      g;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 -2 0 0 0 0];
+
+internalField	uniform	(9.81 0 0);
+
+boundaryField
+{
+    inlet
+    {
+        type    fixedValue;
+        value   uniform (9.81 0 0);
+    }
+
+    outlet
+    {
+        type    fixedValue;
+        value   uniform (9.81 0 0);
+    }
+
+    emptySideWalls
+    {
+        type    empty;
+    }
+
+========
+
+solverInfo
+{
+    type		solverInfo;
+    libs		("libutilityFunctionObjects.so");
+    fields		(T);
+    writeResidualFields	yes;
+>>>>>>>> main:run/sinPureConvection/sinPureConvection.orig/system/solverInfo
+}
+
+
+// ************************************************************************* //

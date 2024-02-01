@@ -1,0 +1,83 @@
+#!/bin/sh
+cd "${0%/*}" || exit                                # Run from this directory
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions        # Tutorial run functions
+#------------------------------------------------------------------------------
+
+caseLabel="sinePureConvection"
+
+# Define grid refinement
+gridPoints=$1
+
+# Change grid refinement in .orig base case
+
+changeGridDict()
+{
+newBlocks="( hex ( 0 1 2 3 4 5 6 7 ) ( $gridPoints 1 1 ) simpleGrading ( 1 1 1 ) );"
+foamDictionary ./"$caseLabel".orig/system/blockMeshDict -entry blocks -set \
+"$newBlocks"
+}
+
+changeGridDict $gridPoints
+
+timeStep=$(foamDictionary ./"$caseLabel".orig/system/controlDict -entry deltaT -value)
+
+echo "timestep = $timeStep"
+
+divSchemes="
+upwind
+Minmod
+MUSCL
+QUICK
+vanLeer
+"
+# Cloning original case
+clone()
+{
+	foamCloneCase $caseLabel.orig "$caseLabel"_"$1"
+}
+
+#mkdir gnuPlotData
+
+for caseName in $divSchemes
+do
+	clone $caseName
+	foamDictionary ./"$caseLabel"_"$caseName"/system/fvSchemes -entry \
+			divSchemes."div(phi,T)" -set "Gauss $caseName;"
+
+	( cd "$caseLabel"_"$caseName" && runApplication blockMesh && runApplication $(getApplication) )
+
+	latestTime=$(foamDictionary "$caseLabel"_"$caseName"/system/controlDict -entry endTime -value)
+
+	postProcess -latestTime -func singleGraph -case "$caseLabel"_"$caseName"
+
+	cp ./"$caseLabel"_"$caseName"/postProcessing/singleGraph/"$latestTime"/line_T.xy ./gnuPlotData/data_T_"$caseName".xy
+
+	echo " "
+done
+
+#gnuplot ./gnuPlotData/gnuPlot.gnu
+
+gnuplot -p<<EOF
+
+set terminal png size 1000,800 enhanced font "Verdana,20"
+set output "plot_nx=$1.png"
+set colorsequence podo
+set border linewidth 1.5
+
+set title "Numerical dissipation of divergence schemes \n {/*0.7 $1 grid points, Timestep = $timeStep , simulation time = $latestTime s }"
+set xlabel "Radians []"
+set ylabel "Calculated function (sin)"
+
+plot "./gnuPlotData/data_T_Minmod.xy" with lines dt solid lw 2 title "Minmod",\
+        "./gnuPlotData/data_T_MUSCL.xy" with lines dt solid lw 2 title "MUSCL",\
+        "./gnuPlotData/data_T_QUICK.xy" with lines dt solid lw 2 title "QUICK",\
+        "./gnuPlotData/data_T_upwind.xy" with lines dt solid lw 2 title "Upwind",\
+        "./gnuPlotData/data_T_vanLeer.xy" with lines dt solid lw 2 lc 8 title "VanLeer",\
+        0.5 + 0.3*sin(2*pi*x) with lines dt solid lw 2 title "Exact"
+
+EOF
+
+echo "Output plot generated at 'plot_nx=$1.png'"
+echo " "
+
+#------------------------------------------------------------------------------

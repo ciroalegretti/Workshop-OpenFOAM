@@ -3,7 +3,7 @@ cd "${0%/*}" || exit                                # Run from this directory
 . ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions        # Tutorial run functions
 #------------------------------------------------------------------------------
 
-caseLabel="sinPureConvection"
+caseLabel="stepPureConvection"
 
 # Define grid refinement
 gridPoints=$1
@@ -66,14 +66,17 @@ set border linewidth 1.5
 
 set title "Numerical dissipation of divergence schemes \n {/*0.7 $1 grid points, Timestep = $timeStep , simulation time = $latestTime s }"
 set xlabel "Radians []"
-set ylabel "Calculated function (sin)"
+set ylabel "Calculated function (step)"
+
+f(x)=x<=0.5 ? 0.5 : x>0.5 ? 0.0 : 1.0
 
 plot "./gnuPlotData/data_T_Minmod.xy" with lines dt solid lw 2 title "Minmod",\
         "./gnuPlotData/data_T_MUSCL.xy" with lines dt solid lw 2 title "MUSCL",\
         "./gnuPlotData/data_T_QUICK.xy" with lines dt solid lw 2 title "QUICK",\
         "./gnuPlotData/data_T_upwind.xy" with lines dt solid lw 2 title "Upwind",\
         "./gnuPlotData/data_T_vanLeer.xy" with lines dt solid lw 2 lc 8 title "VanLeer",\
-        0.5 + 0.3*sin(2*pi*x) with lines dt solid lw 2 title "Exact"
+	f(x) with lines dt solid lw 2 title "Exact"
+
 
 EOF
 
