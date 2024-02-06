@@ -1,0 +1,165 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2212                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+scale   0.1;
+
+// versao atual do dicionario de malha em bloco (adição de um obstáculo)
+
+vertices
+(
+    (0 0 0) 		// vertice 0
+    (0.45 0 0)  	// vertice 1   
+    (0.55 0 0)  	// vertice 2
+    (1 0 0)     	// vertice 3
+    (0 0.1 0)   	// vertice 4
+    (0.45 0.1 0) 	// vertice 5   
+    (0.55 0.1 0) 	// vertice 6
+    (1 0.1 0) 		// vertice 7
+    (0 1 0)		// vertice 8		
+    (0.45 1 0)		// vertice 9
+    (0.55 1 0)		// vertice 10
+    (1 1 0)		// vertice 11
+    (0 0 0.1) 		// vertice 12
+    (0.45 0 0.1)  	// vertice 13   
+    (0.55 0 0.1)  	// vertice 14
+    (1 0 0.1)     	// vertice 15
+    (0 0.1 0.1)   	// vertice 16
+    (0.45 0.1 0.1) 	// vertice 17   
+    (0.55 0.1 0.1) 	// vertice 18
+    (1 0.1 0.1) 	// vertice 19
+    (0 1 0.1)		// vertice 20		
+    (0.45 1 0.1)	// vertice 21
+    (0.55 1 0.1)	// vertice 22
+    (1 1 0.1)		// vertice 23
+);
+
+blocks
+(
+    hex (0 1 5 4 12 13 17 16) (9 2 1) simpleGrading (1 1 1) 	// bloco 1
+    hex (2 3 7 6 14 15 19 18) (9 2 1) simpleGrading (1 1 1) 	// bloco 2
+    hex (4 5 9 8 16 17 21 20) (9 18 1) simpleGrading (1 1 1) 	// bloco 3
+    hex (5 6 10 9 17 18 22 21) (2 18 1) simpleGrading (1 1 1) 	// bloco 4 
+    hex (6 7 11 10 18 19 23 22) (9 18 1) simpleGrading (1 1 1) 	// bloco 5       
+);
+
+edges
+(
+);
+
+boundary
+(
+    movingWall
+    {
+        type wall;
+        faces
+        (
+            (8 20 21 9)		// Parede móvel vinculada ao bloco 3
+	    (9 21 22 10)	// Parede móvel vinculada ao bloco 4
+	    (10 22 23 11)	// Parede móvel vinculada ao bloco 5    
+        );
+    }
+    fixedWalls
+    {
+        type wall;
+        faces
+        (
+            (0 12 16 4)		// Parede fixa (lateral esquerda) - bloco 3
+            (4 16 20 8)		// Parede fixa (lateral esquerda) - bloco 1
+            (0 1 13 12)		// Parede fixa (inferior) - bloco 1
+            (1 5 17 13)		// Parede fixa (lateral esquerda do obstáculo) - bloco 1           
+            (5 6 18 17)		// Parede fixa (topo do obstáculo) - bloco 4
+            (2 14 18 6)		// Parede fixa (lateral direita do obstáculo) - bloco 2
+	    (2 3 15 14)		// Parede fixa (inferior) - bloco 2
+	    (7 19 15 3)		// Parede fixa (lateral direita) - bloco 5
+	    (11 23 19 7)	// Parede fixa (lateral direita) - bloco 2        
+        );
+    }
+    frontAndBack
+    {
+        type empty;
+        faces
+        (
+            (0 4 5 1)		// Parede do fundo - bloco 1
+            (4 8 9 5)		// Parede do fundo - bloco 3
+            (5 9 10 6)		// Parede do fundo - bloco 4
+            (6 10 11 7)		// Parede do fundo - bloco 5
+            (2 6 7 3)		// Parede do fundo - bloco 2
+            (12 13 17 16)	// Parede da frente - bloco 1
+            (16 17 21 20)	// Parede da frente - bloco 3
+            (17 18 22 21)	// Parede da frente - bloco 4
+            (18 19 23 22)       // Parede da frente - bloco 5
+            (14 15 19 18)	// Parede da frente - bloco 2    
+        );
+    }
+);
+
+
+
+/* versao antiga do dicionario de malha em bloco
+vertices
+(
+    (0 0 0)
+    (1 0 0)
+    (1 1 0)
+    (0 1 0)
+    (0 0 0.1)
+    (1 0 0.1)
+    (1 1 0.1)
+    (0 1 0.1)
+);
+
+blocks
+(
+    hex (0 1 2 3 4 5 6 7) (20 20 1) simpleGrading (1 1 1)
+);
+
+edges
+(
+);
+
+boundary
+(
+    movingWall
+    {
+        type wall;
+        faces
+        (
+            (3 7 6 2)
+        );
+    }
+    fixedWalls
+    {
+        type wall;
+        faces
+        (
+            (0 4 7 3)
+            (2 6 5 1)
+            (1 5 4 0)
+        );
+    }
+    frontAndBack
+    {
+        type empty;
+        faces
+        (
+            (0 3 2 1)
+            (4 5 6 7)
+        );
+    }
+);
+*/
+
+// ************************************************************************* //
